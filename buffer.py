@@ -1,3 +1,7 @@
+import timestring
+import datetime
+import time
+import twitter
 import re
 url_re = re.compile(r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?]))")
 url_re2 = re.compile("(?:\w+://|www\.)[^ ,.?!#%=+][^ ]*")
@@ -7,15 +11,30 @@ class buffer(object):
 	def __init__(self,name,statuses):
 		self.name=name
 		self.statuses=statuses
+		self.position=0
 
 global buffers
 buffers=[]
 
+def get_buffer_item(name,index):
+	for i in range(len(buffers)):
+		if buffers[i].name==name:
+			return buffers[i].statuses[index]
+
+def add_buffer_item(name,item):
+	for i in range(len(buffers)):
+		if buffers[i].name==name:
+			buffers[i].statuses.insert(0,item)
+			if gui.interface.window.focused==name:
+				gui.interface.window.tweets.Insert(process_tweet(item),0)
+
 def insert_buffer_items(name):
+	gui.interface.window.tweets.Clear()
 	for i in range(len(buffers)):
 		if buffers[i].name==name:
 			for i2 in range(len(buffers[i].statuses)):
-				gui.interface.window.tweets.Insert(process_tweet(buffers[i].statuses[i2]),gui.interface.window.list.GetCount()-1)
+				gui.interface.window.tweets.Insert(process_tweet(buffers[i].statuses[i2]),gui.interface.window.tweets.GetCount())
+			gui.interface.window.tweets.SetSelection(buffers[i].position)
 
 def process_tweet(s,return_only_text=False):
 	text=s['text']
@@ -43,7 +62,17 @@ def process_tweet(s,return_only_text=False):
 				text=text.replace(urls[url],"Quoting "+qs['user']['name']+": "+process_tweet(qs,True))
 
 	s['text']=text
-	template="$user.name$: $text$"
+	template="$user.screen_name$: $text$ $created_at$"
+	if return_only_text==False:
+		return template_to_string(template,s)
+	else:
+		return text
+
+def find_urls_in_text(text):
+	return [s.strip(bad_chars) for s in url_re2.findall(text)]
+
+def template_to_string(template,s):
+	s['created_at']=parse_date(s['created_at'])
 	temp=template.split(" ")
 	for i in range(len(temp)):
 		if "$" in temp[i]:
@@ -66,11 +95,77 @@ def process_tweet(s,return_only_text=False):
 						template=template.replace("$"+t[1]+"$",s[t[1]])
 					except:
 						pass
+	return template
 
-	if return_only_text==False:
-		return template
-	else:
-		return text
+def get_users_in_tweet(s):
+	new=""
 
-def find_urls_in_text(text):
-	return [s.strip(bad_chars) for s in url_re2.findall(text)]
+	if s.has_key("quoted_status")!=False:
+		s['text']+=" "+s['quoted_status']['user']['screen_name']
+
+	if s.has_key("retweeted_status")!=False:
+		s['text']+=" "+s['retweeted_status']['user']['screen_name']
+
+	new="@"+s['user']['screen_name']
+
+	weew=s['text'].split(" ")
+	for i in range(0,len(weew)):
+		if "@" in weew[i] and weew[i]!="@"+twitter.screenname:
+			new+=" "+weew[i]
+	return new
+
+def user(s):
+	return s['user']['screen_name']
+
+def get_focused_tweet():
+	index=gui.interface.window.tweets.GetSelection()
+	focused=gui.interface.window.focused
+	return get_buffer_item(focused,index)
+
+def parse_date(date):
+	try:
+		ti=datetime.datetime.now()
+		tz=time.altzone
+		date2=datetime.datetime.strptime(date.replace("+0000 ",""),"%a %b %d %H:%M:%S %Y")
+		try:
+			date2+=datetime.timedelta(seconds=0-tz)
+		except:
+			pass
+		returnstring=""
+
+		try:
+			if date2.year==ti.year:
+				if date2.day==ti.day and date2.month==ti.month:
+					returnstring=""
+				else:
+					returnstring=date2.strftime("%m/%d/%Y, ")
+			else:
+				returnstring=date2.strftime("%m/%d/%Y, ")
+
+			if returnstring!="":
+				returnstring+=date2.strftime("%I:%M:%S %p")
+			else:
+				returnstring=date2.strftime("%I:%M:%S %p")
+		except:
+			pass
+	except:
+		return date
+	return returnstring
+
+def update_buffer_item(name,index,item):
+	remove_buffer_item(name,index)
+	insert_buffer_item(name,index,item)
+
+def remove_buffer_item(name,index):
+	for i in range(len(buffers)):
+		if buffers[i].name==name:
+			buffers[i].statuses.pop(index)
+			if gui.interface.window.focused==name:
+				gui.interface.window.tweets.Delete(index)
+
+def insert_buffer_item(name,index,item):
+	for i in range(len(buffers)):
+		if buffers[i].name==name:
+			buffers[i].statuses.insert(index,item)
+			if gui.interface.window.focused==name:
+				gui.interface.window.tweets.Insert(process_tweet(item),index)

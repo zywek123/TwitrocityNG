@@ -1,7 +1,9 @@
+import platform
 from gui import tweet
 import application
 import wx
 import buffer
+import twitter
 class MainGui(wx.Frame):
 	def __init__(self, title):
 		self.focused=None
@@ -13,6 +15,18 @@ class MainGui(wx.Frame):
 		menu = wx.Menu()
 		m_tweet = menu.Append(-1, "&Tweet", "Tweet")
 		self.Bind(wx.EVT_MENU, self.tweet, m_tweet)
+		m_reply = menu.Append(-1, "&Reply (Single User)", "Reply")
+		self.Bind(wx.EVT_MENU, self.reply, m_reply)
+		m_reply_all = menu.Append(-1, "Reply (&All Users)", "ReplyAll")
+		self.Bind(wx.EVT_MENU, self.reply_all, m_reply_all)
+		m_retweet = menu.Append(-1, "Ret&weet")
+		self.Bind(wx.EVT_MENU, self.retweet, m_retweet)
+		m_message = menu.Append(-1, "Send &direct message")
+		self.Bind(wx.EVT_MENU, self.message, m_message)
+		m_like = menu.Append(-1, "Toggle &Like")
+		self.Bind(wx.EVT_MENU, self.like, m_like)
+		m_quote = menu.Append(-1, "&Quote")
+		self.Bind(wx.EVT_MENU, self.quote, m_quote)
 		self.menuBar.Append(menu, "&Tweet")
 		self.SetMenuBar(self.menuBar)
 		self.list_label=wx.StaticText(self.panel, -1, "Timelines")
@@ -23,6 +37,19 @@ class MainGui(wx.Frame):
 		self.tweets=wx.ListBox(self.panel, -1)
 		self.main_box.Add(self.tweets, 0, wx.ALL, 10)
 		self.tweets.Bind(wx.EVT_BUTTON, self.on_tweets_change)
+
+		accel=[]
+		accel.append((wx.ACCEL_CTRL, ord('T'), m_tweet.GetId()))
+		accel.append((wx.ACCEL_CTRL, ord('R'), m_reply.GetId()))
+		accel.append((wx.ACCEL_CTRL+wx.ACCEL_SHIFT, ord('R'), m_reply_all.GetId()))
+		accel.append((wx.ACCEL_CTRL, ord('D'), m_message.GetId()))
+		accel.append((wx.ACCEL_CTRL+wx.ACCEL_SHIFT, ord('T'), m_retweet.GetId()))
+		if platform.system=="Darwin":
+			accel.append((wx.ACCEL_NONE, ord('Q'), m_quote.GetId()))
+		else:
+			accel.append((wx.ACCEL_CTRL, ord('Q'), m_quote.GetId()))
+		accel_tbl=wx.AcceleratorTable(accel)
+		self.SetAcceleratorTable(accel_tbl)
 
 		self.panel.Layout()
 	def on_list_change(self, event):
@@ -35,6 +62,45 @@ class MainGui(wx.Frame):
 
 	def tweet(self,event):
 		t=tweet.TweetGui()
+		t.Show()
+
+	def message(self,event):
+		f=buffer.get_focused_tweet()
+		u=buffer.user(f)
+		t=tweet.DMGui(u)
+		t.Show()
+
+	def reply(self,event):
+		if self.focused=="Direct Messages":
+			self.message()
+		else:
+			f=buffer.get_focused_tweet()
+			u=buffer.user(f)
+			t=tweet.TweetGui("@"+u+" ",f['id_str'])
+			t.Show()
+
+	def reply_all(self,event):
+		f=buffer.get_focused_tweet()
+		u=buffer.get_users_in_tweet(f)
+		t=tweet.TweetGui(u+" ",f['id_str'])
+		t.Show()
+
+	def like(self,event):
+		f=buffer.get_focused_tweet()
+		if f['favorited']==True:
+			twitter.Unlike(f['id_str'])
+		elif f['favorited']==False:
+			twitter.Like(f['id_str'])
+		stat=twitter.twitter.lookup_status(id=f['id_str'])
+		buffer.update_buffer_item(self.focused,self.tweets.GetSelection(),stat[0])
+
+	def retweet(self,event):
+		f=buffer.get_focused_tweet()
+		twitter.Retweet(f['id_str'])
+
+	def quote(self,event):
+		f=buffer.get_focused_tweet()
+		t=tweet.QuoteGui(f['id_str'])
 		t.Show()
 
 	def OnClose(self, event):

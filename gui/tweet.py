@@ -41,7 +41,11 @@ class TweetGui(wx.Frame):
 	def Tweet(self, event):
 		if self.edit==1:
 			twitter.Delete(self.id)
-		status=twitter.Tweet(self.text.GetValue())
+		if self.id!="":
+			status=twitter.Tweet(self.text.GetValue(),self.id)
+		else:
+			status=twitter.Tweet(self.text.GetValue())
+
 		if status==True:
 			self.Destroy()
 	def OnClose(self, event):
@@ -56,8 +60,9 @@ class QuoteGui(wx.Frame):
 
 	def __init__(self,i=""):
 		self.id=i
-		a=twitter.api.get_status(self.id)
-		self.inittext=a.text
+		returned=twitter.twitter.lookup_status(id=self.id)
+		self.status=returned[0]
+		self.inittext=self.status['text']
 		wx.Frame.__init__(self, None, title="Tweet", size=(350,200)) # initialize the wx frame
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 		self.panel = wx.Panel(self)
@@ -80,7 +85,7 @@ class QuoteGui(wx.Frame):
 	def EVT_TEXT_ENTER(self,event):
 		speak.speak("Boing")
 	def Tweet(self, event):
-		twitter.Quote(status=self.id,text=self.text.GetValue())
+		twitter.Quote(s=self.status,text=self.text.GetValue())
 		self.Destroy()
 	def OnClose(self, event):
 		"""App close event handler"""

@@ -4,11 +4,10 @@ import webbrowser
 import config
 import twython
 timelines=collections.OrderedDict()
-apikey="3HRxJuiTtakz2plHTqUfPsJkX"
-apisecret="ONgUT64zlHevkZXVMy6I1KTlba4iTlCT8LVpY1mQdqd8lYozs0"
+apikey="gRcSncxR8Y2buqPYFd4U8qJKU"
+apisecret="4gq2245Nust9dLCOTzBaJKvJQgrzwiqBYfKVDm7cpw1kb7WfUQ"
 def auth():
 	global twitter
-	config.setup()
 	twitter = twython.Twython(apikey, apisecret)
 	global auth
 	if config.appconfig['general']['key']=="" or config.appconfig['general']['secret']=="":
@@ -24,8 +23,25 @@ def auth():
 		config.appconfig.write()
 
 	twitter = twython.Twython(apikey, apisecret,config.appconfig['general']['key'],config.appconfig['general']['secret'])
+	account=twitter.get_account_settings()
+	global screenname
+	screenname=account['screen_name']
 
-def Tweet(text):
-	twitter.update_status(status=text)
+def Tweet(text,id=""):
+	if id=="":
+		twitter.update_status(status=text)
+	else:
+		twitter.update_status(status=text,in_reply_to_status_id=id)
 	return True
 
+def Retweet(id):
+	twitter.retweet(id=id)
+def Like(id):
+	twitter.create_favorite(id=id)
+
+def Unlike(id):
+	twitter.destroy_favorite(id=id)
+
+def Quote(text,s):
+	url="https://twitter.com/"+s['user']['screen_name']+"/status/"+s['id_str']+"/"
+	Tweet(text+" "+url)

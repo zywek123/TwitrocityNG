@@ -1,3 +1,5 @@
+import config
+config.setup()
 import twitter
 import wx
 app = wx.App(redirect=False)
