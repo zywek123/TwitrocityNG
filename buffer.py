@@ -3,6 +3,7 @@ import datetime
 import time
 import twitter
 import re
+import config
 url_re = re.compile(r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?]))")
 url_re2 = re.compile("(?:\w+://|www\.)[^ ,.?!#%=+][^ ]*")
 bad_chars = "'\\.,[](){}:;\""
@@ -62,16 +63,20 @@ def process_tweet(s,return_only_text=False):
 				text=text.replace(urls[url],"Quoting "+qs['user']['name']+": "+process_tweet(qs,True))
 
 	s['text']=text
-	template="$user.screen_name$: $text$ $created_at$"
 	if return_only_text==False:
-		return template_to_string(template,s)
+		return template_to_string(s)
 	else:
 		return text
 
 def find_urls_in_text(text):
 	return [s.strip(bad_chars) for s in url_re2.findall(text)]
 
-def template_to_string(template,s):
+def template_to_string(s):
+	if s.has_key("sender"):
+		template=config.appconfig['general']['message_template']
+	else:
+		template=config.appconfig['general']['tweet_template']
+
 	s['created_at']=parse_date(s['created_at'])
 	temp=template.split(" ")
 	for i in range(len(temp)):
@@ -115,7 +120,10 @@ def get_users_in_tweet(s):
 	return new
 
 def user(s):
-	return s['user']['screen_name']
+	if s.has_key('user'):
+		return s['user']['screen_name']
+	else:
+		return s['sender']['screen_name']
 
 def get_focused_tweet():
 	index=gui.interface.window.tweets.GetSelection()

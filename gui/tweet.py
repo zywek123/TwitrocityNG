@@ -118,9 +118,8 @@ class DMGui(wx.Frame):
 		self.main_box.Add(self.close, 0, wx.ALL, 10)
 		self.panel.Layout()
 	def Tweet(self, event):
-		status=twitter.Tweet("d @"+self.recip.GetValue()+" "+self.text.GetValue(),0)
-		if status==True:
-			self.Destroy()
+		twitter.DM(self.recip.GetValue(),self.text.GetValue())
+		self.Destroy()
 	def OnClose(self, event):
 		"""App close event handler"""
 		self.Destroy()

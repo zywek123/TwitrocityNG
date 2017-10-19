@@ -4,8 +4,10 @@ import webbrowser
 import config
 import twython
 timelines=collections.OrderedDict()
-apikey="gRcSncxR8Y2buqPYFd4U8qJKU"
-apisecret="4gq2245Nust9dLCOTzBaJKvJQgrzwiqBYfKVDm7cpw1kb7WfUQ"
+apikey="W48NhXLuPeP66yvcXXurhQPY6"
+apisecret="jST5JRY7KK8tjyxEm6QcpIWrHrMWeHXqyNPsK5w0ohYd9L7kHu"
+#apikey="gRcSncxR8Y2buqPYFd4U8qJKU"
+#apisecret="4gq2245Nust9dLCOTzBaJKvJQgrzwiqBYfKVDm7cpw1kb7WfUQ"
 def auth():
 	global twitter
 	twitter = twython.Twython(apikey, apisecret)
@@ -33,6 +35,9 @@ def Tweet(text,id=""):
 	else:
 		twitter.update_status(status=text,in_reply_to_status_id=id)
 	return True
+
+def DM(user,text):
+	twitter.send_direct_message(user=user,text=text)
 
 def Retweet(id):
 	twitter.retweet(id=id)

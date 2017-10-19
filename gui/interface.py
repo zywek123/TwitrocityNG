@@ -72,7 +72,7 @@ class MainGui(wx.Frame):
 
 	def reply(self,event):
 		if self.focused=="Direct Messages":
-			self.message()
+			self.message(0)
 		else:
 			f=buffer.get_focused_tweet()
 			u=buffer.user(f)

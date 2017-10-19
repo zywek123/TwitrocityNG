@@ -7,10 +7,9 @@ import twitter
 class HomeStream(TwythonStreamer):
 	def on_success(self, data):
 		if 'text' in data:
-			if 'recipient' not in data:
-				buffer.add_buffer_item("Home",data)
-			else:
-				buffer.add_buffer_item("Direct Messages",data)
+			buffer.add_buffer_item("Home",data)
+		elif 'direct_message' in data:
+			buffer.add_buffer_item("Direct Messages",data['direct_message'])
 
 	def on_error(self, status_code, data):
 		print status_code
@@ -28,6 +27,7 @@ class HomeTimeline(object):
 	def __init__(self):
 		t=Thread(target=self.create_timeline)
 		t.start()
+		self.index=0
 
 	def create_timeline(self):
 		self.statuses=twitter.twitter.get_home_timeline(count=200)
@@ -41,6 +41,7 @@ class MentionsTimeline(object):
 	def __init__(self):
 		t=Thread(target=self.create_timeline)
 		t.start()
+		self.index=0
 
 	def create_timeline(self):
 		self.statuses=twitter.twitter.get_mentions_timeline(count=200)
@@ -54,6 +55,7 @@ class LikesTimeline(object):
 	def __init__(self):
 		t=Thread(target=self.create_timeline)
 		t.start()
+		self.index=0
 
 	def create_timeline(self):
 		self.statuses=twitter.twitter.get_favorites(count=200)
@@ -65,6 +67,7 @@ class DirectMessagesTimeline(object):
 	def __init__(self):
 		t=Thread(target=self.create_timeline)
 		t.start()
+		self.index=0
 
 	def create_timeline(self):
 		self.statuses=twitter.twitter.get_direct_messages(count=200)
