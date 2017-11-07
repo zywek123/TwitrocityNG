@@ -22,7 +22,7 @@ class TweetGui(wx.Frame):
 		self.text.Bind(wx.EVT_TEXT, self.Chars)
 		self.text.AppendText(inittext)
 		#self.text.SetSelection(self.text.GetLastPosition()-1,self.text.GetLastPosition())
-		self.text.SetMaxLength(140)
+		self.text.SetMaxLength(280)
 		#self.text.SetInsertionPoint(self.text.GetLastPosition())
 		self.tweet = wx.Button(self.panel, wx.ID_DEFAULT, "&Send")
 		self.tweet.SetDefault()
@@ -36,8 +36,8 @@ class TweetGui(wx.Frame):
 		twitter.snd.play("boundary")
 	def Chars(self, event):
 		length=round(len(self.text.GetValue()),0)
-		percent=str(round((length/140)*100,0))
-		self.SetLabel("Tweet - "+str(length).split(".")[0]+" of 140 characters ("+percent+" Percent)")
+		percent=str(round((length/280)*100,0))
+		self.SetLabel("Tweet - "+str(length).split(".")[0]+" of 280 characters ("+percent+" Percent)")
 	def Tweet(self, event):
 		if self.edit==1:
 			twitter.Delete(self.id)
