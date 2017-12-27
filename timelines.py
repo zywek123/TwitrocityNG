@@ -30,7 +30,7 @@ class HomeTimeline(object):
 		self.index=0
 
 	def create_timeline(self):
-		self.statuses=twitter.twitter.get_home_timeline(count=200)
+		self.statuses=twitter.twitter.get_home_timeline(count=200,twitter_mode='extended')
 		self.buffer=buffer.buffer("Home",self.statuses)
 		buffer.buffers.insert(0,self.buffer)
 		interface.window.list.Insert(buffer.buffers[0].name,0)
