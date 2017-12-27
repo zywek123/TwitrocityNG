@@ -3,6 +3,9 @@ import config_utils
 from sys import platform
 import os
 import shutil
+if platform == "linux" or platform == "linux2":
+	import getpass
+	import pwd
 if platform == "win32":
 	user = os.getenv('AppData')
 	if os.path.exists("config.cfg"):
@@ -14,13 +17,14 @@ if platform == "win32":
 			os.makedirs(user+"\\twitrocity")
 	MAINFILE = user+"\\twitrocity\\twitrocity.cfg"
 elif platform == "linux" or platform == "linux2":
-	user = os.getenv("user")
+	user = pwd.getpwuid(os.getuid())[0]
 	if os.path.exists("/home/"+user+"/.config/twitrocity.cfg"):
 		if not os.path.exists("/home/"+user+"/.twitrocity"):
 			os.makedirs("/home/"+user+"/.twitrocity")
 		shutil.move("/home/"+user+"/.config/twitrocity.cfg", "/home/"+user+"/.twitrocity/twitrocity.cfg")
 	else:
-		os.makedirs("/home/"+user+"/.twitrocity")
+		if not os.path.exists("/home/"+user+"/.twitrocity"):
+			os.makedirs("/home/"+user+"/.twitrocity")
 	MAINFILE = "/home/"+user+"/.silver/twitrocity.cfg"
 MAINSPEC = "app.defaults"
 #appconfig=None

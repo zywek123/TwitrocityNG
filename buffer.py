@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import timestring
 import datetime
 import time
