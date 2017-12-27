@@ -13,6 +13,10 @@ class MainGui(wx.Frame):
 		self.main_box = wx.BoxSizer(wx.VERTICAL)
 		self.menuBar = wx.MenuBar()
 		menu = wx.Menu()
+		m_close = menu.Append(-1, "exit", "exit")
+		self.Bind(wx.EVT_MENU, self.OnClose, m_close)
+		self.menuBar.Append(menu, "&Application")
+		menu = wx.Menu()
 		m_tweet = menu.Append(-1, "&Tweet", "Tweet")
 		self.Bind(wx.EVT_MENU, self.tweet, m_tweet)
 		m_reply = menu.Append(-1, "&Reply (Single User)", "Reply")
@@ -106,5 +110,6 @@ class MainGui(wx.Frame):
 	def OnClose(self, event):
 		"""App close event handler"""
 		self.Destroy()
+		twitter.exit()
 global window
 window=MainGui(application.name+" V"+application.version)

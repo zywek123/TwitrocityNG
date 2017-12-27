@@ -1,3 +1,4 @@
+import os
 from gui import ask
 import collections
 import webbrowser
@@ -50,3 +51,5 @@ def Unlike(id):
 def Quote(text,s):
 	url="https://twitter.com/"+s['user']['screen_name']+"/status/"+s['id_str']+"/"
 	Tweet(text+" "+url)
+def exit():
+	os._exit(0)

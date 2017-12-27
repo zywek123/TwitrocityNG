@@ -1,6 +1,7 @@
 import speak
 import twitter
 import wx
+from sys import platform # Linux compatibility
 class TweetGui(wx.Frame):
 
 	global inittext
@@ -15,7 +16,10 @@ class TweetGui(wx.Frame):
 		self.panel = wx.Panel(self)
 		self.main_box = wx.BoxSizer(wx.VERTICAL)
 		self.text_label = wx.StaticText(self.panel, -1, "Tweet Te&xt")
-		self.text = wx.TextCtrl(self.panel, -1, "",style=wx.TE_MULTILINE|wx.TE_PROCESS_ENTER|wx.TE_DONTWRAP)
+		if platform == "win32":
+			self.text = wx.TextCtrl(self.panel, -1, "",style=wx.TE_MULTILINE|wx.TE_PROCESS_ENTER|wx.TE_DONTWRAP)
+		elif platform == "linux" or platform == "linux2":
+			self.text = wx.TextCtrl(self.panel, -1, "",style=wx.TE_PROCESS_ENTER|wx.TE_DONTWRAP)
 		self.main_box.Add(self.text, 0, wx.ALL, 10)
 		self.text.Bind(wx.EVT_TEXT_ENTER, self.Tweet)
 		self.text.Bind(wx.EVT_TEXT_MAXLEN, self.Maximum)
