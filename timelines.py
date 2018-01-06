@@ -30,7 +30,7 @@ class HomeTimeline(object):
 		self.index=0
 
 	def create_timeline(self):
-		self.statuses=twitter.twitter.get_home_timeline(count=200,twitter_mode='extended')
+		self.statuses=twitter.twitter.get_home_timeline(count=200,tweet_mode='extended')
 		self.buffer=buffer.buffer("Home",self.statuses)
 		buffer.buffers.insert(0,self.buffer)
 		interface.window.list.Insert(buffer.buffers[0].name,0)
@@ -44,7 +44,7 @@ class MentionsTimeline(object):
 		self.index=0
 
 	def create_timeline(self):
-		self.statuses=twitter.twitter.get_mentions_timeline(count=200)
+		self.statuses=twitter.twitter.get_mentions_timeline(count=200,tweet_mode='extended')
 		self.buffer=buffer.buffer("Mentions",self.statuses)
 		buffer.buffers.append(self.buffer)
 		interface.window.list.Insert(buffer.buffers[len(buffer.buffers)-1].name,interface.window.list.GetCount())
@@ -58,7 +58,7 @@ class LikesTimeline(object):
 		self.index=0
 
 	def create_timeline(self):
-		self.statuses=twitter.twitter.get_favorites(count=200)
+		self.statuses=twitter.twitter.get_favorites(count=200,tweet_mode='extended')
 		self.buffer=buffer.buffer("Likes",self.statuses)
 		buffer.buffers.append(self.buffer)
 		interface.window.list.Insert(buffer.buffers[len(buffer.buffers)-1].name,interface.window.list.GetCount())

@@ -15,7 +15,7 @@ class MainGui(wx.Frame):
 		self.main_box = wx.BoxSizer(wx.VERTICAL)
 		self.menuBar = wx.MenuBar()
 		menu = wx.Menu()
-		m_close = menu.Append(-1, "exit", "exit")
+		m_close = menu.Append(-1, "E&xit")
 		self.Bind(wx.EVT_MENU, self.OnClose, m_close)
 		self.menuBar.Append(menu, "&Application")
 		menu = wx.Menu()
@@ -35,9 +35,9 @@ class MainGui(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.quote, m_quote)
 		self.menuBar.Append(menu, "&Tweet")
 		menu = wx.Menu()
-		m_follow = menu.Append(1, "&Follow user", "follow user")
+		m_follow = menu.Append(1, "&Follow user", "follow")
 		self.Bind(wx.EVT_MENU, self.follow, m_follow)
-		m_unfollow = menu.Append(-1, "&Unfollow user", "unfollow user")
+		m_unfollow = menu.Append(-1, "Unfol&low user")
 		self.Bind(wx.EVT_MENU, self.unfollow, m_unfollow)
 		self.menuBar.Append(menu, "&user")
 		self.SetMenuBar(self.menuBar)
@@ -51,11 +51,14 @@ class MainGui(wx.Frame):
 		self.tweets.Bind(wx.EVT_BUTTON, self.on_tweets_change)
 
 		accel=[]
+		accel.append((wx.ACCEL_ALT, ord('X'), m_close.GetId()))
 		accel.append((wx.ACCEL_CTRL, ord('T'), m_tweet.GetId()))
 		accel.append((wx.ACCEL_CTRL, ord('R'), m_reply.GetId()))
 		accel.append((wx.ACCEL_CTRL+wx.ACCEL_SHIFT, ord('R'), m_reply_all.GetId()))
 		accel.append((wx.ACCEL_CTRL, ord('D'), m_message.GetId()))
 		accel.append((wx.ACCEL_CTRL+wx.ACCEL_SHIFT, ord('T'), m_retweet.GetId()))
+		accel.append((wx.ACCEL_CTRL, ord('L'), m_follow.GetId()))
+		accel.append((wx.ACCEL_CTRL+wx.ACCEL_SHIFT, ord('L'), m_unfollow.GetId()))
 		if platform.system=="Darwin":
 			accel.append((wx.ACCEL_NONE, ord('Q'), m_quote.GetId()))
 		else:

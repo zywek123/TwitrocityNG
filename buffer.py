@@ -39,7 +39,10 @@ def insert_buffer_items(name):
 			gui.interface.window.tweets.SetSelection(buffers[i].position)
 
 def process_tweet(s,return_only_text=False):
-	text=s['text']
+	if s.has_key('full_text')==True:
+		text=s['full_text']
+	else:
+		text=s['text']
 	if s.has_key("entities")!=False:
 		if s['entities'].has_key("urls")!=False:
 			urls=find_urls_in_text(text)
