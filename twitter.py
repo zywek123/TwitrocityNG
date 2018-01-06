@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from gui import ask
 import collections
@@ -51,5 +52,9 @@ def Unlike(id):
 def Quote(text,s):
 	url="https://twitter.com/"+s['user']['screen_name']+"/status/"+s['id_str']+"/"
 	Tweet(text+" "+url)
+def Follow(user):
+	twitter.create_friendship(screen_name=user)
+def Unfollow(user):
+	twitter.destroy_friendship(screen_name=user)
 def exit():
 	os._exit(0)

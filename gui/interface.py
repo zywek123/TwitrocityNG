@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 import platform
 from gui import tweet
 import application
 import wx
 import buffer
 import twitter
+import ask
 class MainGui(wx.Frame):
 	def __init__(self, title):
 		self.focused=None
@@ -32,6 +34,12 @@ class MainGui(wx.Frame):
 		m_quote = menu.Append(-1, "&Quote")
 		self.Bind(wx.EVT_MENU, self.quote, m_quote)
 		self.menuBar.Append(menu, "&Tweet")
+		menu = wx.Menu()
+		m_follow = menu.Append(1, "&Follow user", "follow user")
+		self.Bind(wx.EVT_MENU, self.follow, m_follow)
+		m_unfollow = menu.Append(-1, "&Unfollow user", "unfollow user")
+		self.Bind(wx.EVT_MENU, self.unfollow, m_unfollow)
+		self.menuBar.Append(menu, "&user")
 		self.SetMenuBar(self.menuBar)
 		self.list_label=wx.StaticText(self.panel, -1, "Timelines")
 		self.list=wx.ListBox(self.panel, -1)
@@ -97,6 +105,19 @@ class MainGui(wx.Frame):
 			twitter.Like(f['id_str'])
 		stat=twitter.twitter.lookup_status(id=f['id_str'])
 		buffer.update_buffer_item(self.focused,self.tweets.GetSelection(),stat[0])
+
+	def follow(self,event):
+		t = buffer.get_focused_tweet()
+		u = buffer.user(t)
+		tw = ask.ask(message="Follow who?",default_value=u) #not works correctly
+		print(tw)
+		twitter.Follow(tw)
+
+	def unfollow(self, id):
+		t = buffer.get_focused_tweet()
+		u = buffer.user(t)
+		tw = ask.ask(message="Unfollow who?",default_value=u)
+		twitter.Unfollow(tw)
 
 	def retweet(self,event):
 		f=buffer.get_focused_tweet()
