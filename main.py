@@ -1,7 +1,4 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
 import config
-import pkg
 config.setup()
 import twitter
 import wx

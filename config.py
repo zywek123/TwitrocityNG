@@ -25,7 +25,7 @@ elif platform == "linux" or platform == "linux2":
 	else:
 		if not os.path.exists("/home/"+user+"/.twitrocity"):
 			os.makedirs("/home/"+user+"/.twitrocity")
-	MAINFILE = "/home/"+user+"/.silver/twitrocity.cfg"
+	MAINFILE = "/home/"+user+"/.twitrocity/twitrocity.cfg"
 MAINSPEC = "app.defaults"
 #appconfig=None
 def setup():

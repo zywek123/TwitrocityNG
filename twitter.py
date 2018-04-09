@@ -5,12 +5,22 @@ import collections
 import webbrowser
 import config
 import twython
+import sound
+import audio_player
+global snd
+snd = sound.sound()
+player = audio_player.URLStream()
 timelines=collections.OrderedDict()
 apikey="W48NhXLuPeP66yvcXXurhQPY6"
 apisecret="jST5JRY7KK8tjyxEm6QcpIWrHrMWeHXqyNPsK5w0ohYd9L7kHu"
 #apikey="gRcSncxR8Y2buqPYFd4U8qJKU"
 #apisecret="4gq2245Nust9dLCOTzBaJKvJQgrzwiqBYfKVDm7cpw1kb7WfUQ"
 def auth():
+	global soundpack
+	try:
+		soundpack = config.appconfig['general']['soundpack']
+	except:
+		soundpack = "default"
 	global twitter
 	twitter = twython.Twython(apikey, apisecret)
 	global auth
@@ -36,6 +46,7 @@ def Tweet(text,id=""):
 		twitter.update_status(status=text)
 	else:
 		twitter.update_status(status=text,in_reply_to_status_id=id)
+		snd.play("sendtweet")
 	return True
 
 def DM(user,text):
@@ -43,6 +54,7 @@ def DM(user,text):
 
 def Retweet(id):
 	twitter.retweet(id=id)
+	snd.play("sendtweet")
 def Like(id):
 	twitter.create_favorite(id=id)
 
@@ -52,6 +64,7 @@ def Unlike(id):
 def Quote(text,s):
 	url="https://twitter.com/"+s['user']['screen_name']+"/status/"+s['id_str']+"/"
 	Tweet(text+" "+url)
+	snd.play("sendtweet")
 def Follow(user):
 	twitter.create_friendship(screen_name=user)
 def Unfollow(user):

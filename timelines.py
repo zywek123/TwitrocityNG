@@ -4,12 +4,16 @@ from threading import Thread
 import buffer
 from twython import TwythonStreamer
 import twitter
+import sound
+snd = twitter.snd
 class HomeStream(TwythonStreamer):
 	def on_success(self, data):
 		if 'text' in data:
 			buffer.add_buffer_item("Home",data)
+			snd.play("tweet")
 		elif 'direct_message' in data:
 			buffer.add_buffer_item("Direct Messages",data['direct_message'])
+			snd.play("dm")
 
 	def on_error(self, status_code, data):
 		print status_code
@@ -19,6 +23,7 @@ class MentionsStream(TwythonStreamer):
 		if 'text' in data:
 			if 'recipient' not in data:
 				buffer.add_buffer_item("Mentions",data)
+				snd.play("reply")
 
 	def on_error(self, status_code, data):
 		print status_code
